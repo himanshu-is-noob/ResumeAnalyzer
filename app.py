@@ -56,7 +56,7 @@ TECH_SKILLS = {
     "agile","scrum","kanban",
     "communication","leadership","teamwork","problem-solving",
     "collaboration","management","mentoring","presentation",
-    "analytical","research","documentation","testing",
+    "analytical","research","documentation","testing","c/c++","c"
 }
 
 SECTION_PATTERNS = {
