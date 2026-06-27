@@ -38,82 +38,208 @@ model = load_model()
 
 # ================== CONSTANTS ==================
 
-TECH_SKILLS = {
-    "python","java","javascript","typescript","c++","c#","go","rust",
-    "kotlin","swift","r","scala","php","ruby","matlab","bash","sql",
-    "react","angular","vue","html","css","sass","tailwind","bootstrap",
-    "nextjs","nuxtjs","webpack","vite","redux","graphql","rest","api",
-    "nodejs","django","flask","fastapi","spring","express","laravel",
-    "aws","azure","gcp","docker","kubernetes","terraform","ansible",
-    "linux","nginx","apache","microservices","serverless",
-    "pandas","numpy","scikit-learn","tensorflow","pytorch","keras",
-    "machine learning","deep learning","nlp","computer vision","bert",
-    "transformers","llm","openai","langchain","spark","hadoop",
-    "tableau","powerbi","excel","data analysis","statistics",
-    "mysql","postgresql","mongodb","redis","sqlite","oracle",
-    "elasticsearch","cassandra","dynamodb",
-    "git","github","gitlab","jenkins","ci/cd","jira","confluence",
-    "agile","scrum","kanban",
-    "communication","leadership","teamwork","problem-solving",
-    "collaboration","management","mentoring","presentation",
-    "analytical","research","documentation","testing","c/c++","c" , "C/C++",
-    "data structures" , "algorithms" , "software design" , "CI/CD" , "AWS" , "Azure",
-    "GCP" , ".NET" , ".net" , "Node.js" , "Express.js" , "REST APIs" , "RESTful APIs", 
-    "microservices"
+# Each entry is (display_label, [alias patterns to match in raw text])
+# Patterns are matched case-insensitively against raw lowercased resume/JD text.
+# Using aliases ensures "node.js", "nodejs", "node js" all map to the same skill.
+TECH_SKILLS_MAP = {
+    # --- Languages ---
+    "python":       [r"\bpython\b"],
+    "java":         [r"\bjava\b(?!script)"],           # avoid matching javascript
+    "javascript":   [r"\bjavascript\b", r"\bjs\b"],
+    "typescript":   [r"\btypescript\b", r"\bts\b"],
+    "c++":          [r"\bc\+\+\b", r"\bc/c\+\+\b"],
+    "c#":           [r"\bc#\b"],
+    "c":            [r"\bc\b"],
+    "go":           [r"\bgolang\b", r"\b(?<!\w)go(?!\w)language\b"],
+    "rust":         [r"\brust\b"],
+    "kotlin":       [r"\bkotlin\b"],
+    "swift":        [r"\bswift\b"],
+    "r":            [r"\blanguage r\b", r"\bprogramming in r\b"],
+    "scala":        [r"\bscala\b"],
+    "php":          [r"\bphp\b"],
+    "ruby":         [r"\bruby\b"],
+    "matlab":       [r"\bmatlab\b"],
+    "bash":         [r"\bbash\b", r"\bshell script"],
+    "sql":          [r"\bsql\b"],
+
+    # --- Frontend / Web ---
+    "react":        [r"\breact\b", r"\breactjs\b", r"\breact\.js\b"],
+    "angular":      [r"\bangular\b", r"\bangularjs\b"],
+    "vue":          [r"\bvue\b", r"\bvuejs\b", r"\bvue\.js\b"],
+    "html":         [r"\bhtml\b"],
+    "css":          [r"\bcss\b"],
+    "sass":         [r"\bsass\b", r"\bscss\b"],
+    "tailwind":     [r"\btailwind\b"],
+    "bootstrap":    [r"\bbootstrap\b"],
+    "nextjs":       [r"\bnext\.js\b", r"\bnextjs\b", r"\bnext js\b"],
+    "nuxtjs":       [r"\bnuxt\.js\b", r"\bnuxtjs\b"],
+    "webpack":      [r"\bwebpack\b"],
+    "vite":         [r"\bvite\b"],
+    "redux":        [r"\bredux\b"],
+
+    # --- APIs / Architecture ---
+    "graphql":      [r"\bgraphql\b"],
+    "rest":         [r"\brest\b", r"\brestful\b", r"\brest api", r"\brestful api"],
+    "microservices":[r"\bmicroservice"],
+    "serverless":   [r"\bserverless\b"],
+
+    # --- Backend Frameworks ---
+    "node.js":      [r"\bnode\.js\b", r"\bnodejs\b", r"\bnode js\b"],
+    "express.js":   [r"\bexpress\.js\b", r"\bexpressjs\b", r"\bexpress js\b", r"\bexpress\b"],
+    "django":       [r"\bdjango\b"],
+    "flask":        [r"\bflask\b"],
+    "fastapi":      [r"\bfastapi\b"],
+    "spring":       [r"\bspring\b"],
+    "laravel":      [r"\blaravel\b"],
+    ".net":         [r"\.net\b", r"\bdotnet\b", r"\b\.net framework\b"],
+
+    # --- Cloud ---
+    "aws":          [r"\baws\b", r"\bamazon web services\b"],
+    "azure":        [r"\bazure\b", r"\bmicrosoft azure\b"],
+    "gcp":          [r"\bgcp\b", r"\bgoogle cloud\b"],
+
+    # --- DevOps / Infra ---
+    "docker":       [r"\bdocker\b"],
+    "kubernetes":   [r"\bkubernetes\b", r"\bk8s\b"],
+    "terraform":    [r"\bterraform\b"],
+    "ansible":      [r"\bansible\b"],
+    "linux":        [r"\blinux\b", r"\bubuntu\b", r"\bdebian\b"],
+    "nginx":        [r"\bnginx\b"],
+    "apache":       [r"\bapache\b"],
+    "ci/cd":        [r"\bci/cd\b", r"\bcontinuous integration\b", r"\bcontinuous deployment\b", r"\bjenkins\b", r"\bgithub actions\b"],
+
+    # --- ML / AI ---
+    "pandas":           [r"\bpandas\b"],
+    "numpy":            [r"\bnumpy\b"],
+    "scikit-learn":     [r"\bscikit.learn\b", r"\bsklearn\b"],
+    "tensorflow":       [r"\btensorflow\b"],
+    "pytorch":          [r"\bpytorch\b"],
+    "keras":            [r"\bkeras\b"],
+    "machine learning": [r"\bmachine learning\b", r"\bml\b"],
+    "deep learning":    [r"\bdeep learning\b"],
+    "nlp":              [r"\bnlp\b", r"\bnatural language processing\b"],
+    "computer vision":  [r"\bcomputer vision\b"],
+    "bert":             [r"\bbert\b"],
+    "transformers":     [r"\btransformers\b"],
+    "llm":              [r"\bllm\b", r"\blarge language model"],
+    "openai":           [r"\bopenai\b"],
+    "langchain":        [r"\blangchain\b"],
+    "spark":            [r"\bapache spark\b", r"\bpyspark\b"],
+    "hadoop":           [r"\bhadoop\b"],
+
+    # --- BI / Analytics ---
+    "tableau":      [r"\btableau\b"],
+    "powerbi":      [r"\bpower\s*bi\b"],
+    "excel":        [r"\bexcel\b"],
+    "data analysis":[r"\bdata analysis\b", r"\bdata analytics\b"],
+    "statistics":   [r"\bstatistics\b", r"\bstatistical\b"],
+
+    # --- Databases ---
+    "mysql":        [r"\bmysql\b"],
+    "postgresql":   [r"\bpostgresql\b", r"\bpostgres\b"],
+    "mongodb":      [r"\bmongodb\b", r"\bmongo\b"],
+    "redis":        [r"\bredis\b"],
+    "sqlite":       [r"\bsqlite\b"],
+    "oracle":       [r"\boracle\b"],
+    "elasticsearch":[r"\belasticsearch\b"],
+    "cassandra":    [r"\bcassandra\b"],
+    "dynamodb":     [r"\bdynamodb\b"],
+
+    # --- Version Control / Collaboration ---
+    "git":          [r"\bgit\b"],
+    "github":       [r"\bgithub\b"],
+    "gitlab":       [r"\bgitlab\b"],
+    "jira":         [r"\bjira\b"],
+    "confluence":   [r"\bconfluence\b"],
+
+    # --- Methodologies ---
+    "agile":        [r"\bagile\b"],
+    "scrum":        [r"\bscrum\b"],
+    "kanban":       [r"\bkanban\b"],
+
+    # --- Soft Skills ---
+    "communication":    [r"\bcommunication\b"],
+    "leadership":       [r"\bleadership\b"],
+    "teamwork":         [r"\bteamwork\b", r"\bteam player\b"],
+    "problem-solving":  [r"\bproblem.solving\b", r"\bproblem solving\b"],
+    "collaboration":    [r"\bcollaboration\b", r"\bcollaborat"],
+    "management":       [r"\bmanagement\b"],
+    "mentoring":        [r"\bmentor"],
+    "presentation":     [r"\bpresentation\b"],
+    "analytical":       [r"\banalytical\b", r"\banalysis skills\b"],
+    "research":         [r"\bresearch\b"],
+    "documentation":    [r"\bdocumentation\b"],
+    "testing":          [r"\btesting\b", r"\bunit test", r"\bqa\b"],
+
+    # --- CS Fundamentals ---
+    "data structures":  [r"\bdata structures\b"],
+    "algorithms":       [r"\balgorithm"],
+    "software design":  [r"\bsoftware design\b", r"\bdesign patterns\b"],
 }
 
 SECTION_PATTERNS = {
     "education":    r"\b(education|academic|degree|university|college|school)\b",
-    "experience":   r"\b(experience|employment|work history|professional background|career|PROFESSIONAL EXPERIENCE)\b",
-    "skills":       r"\b(skills|technical skills|competencies|expertise|technologies|Technical|Technical Skills)\b",
-    "projects":     r"\b(projects|portfolio|works|assignments|project work|Major Projects)\b",
+    "experience":   r"\b(experience|employment|work history|professional background|career|professional experience)\b",
+    "skills":       r"\b(skills|technical skills|competencies|expertise|technologies)\b",
+    "projects":     r"\b(projects|portfolio|works|assignments|project work|major projects)\b",
     "achievements": r"\b(achievements|awards|honors|certifications|accomplishments)\b",
     "contact":      r"\b(contact|email|phone|linkedin|github|address)\b",
 }
 
-# Strong action verbs that ATS systems reward
 ACTION_VERBS = {
-    # Engineering / Development
     "developed","built","designed","engineered","implemented","architected",
     "deployed","automated","optimized","refactored","migrated","integrated",
     "created","launched","delivered","shipped","coded","programmed",
-    # Leadership / Management
     "led","managed","directed","coordinated","supervised","mentored",
     "trained","guided","oversaw","spearheaded","drove","established",
-    # Impact / Results
     "increased","decreased","reduced","improved","accelerated","boosted",
     "achieved","exceeded","generated","saved","cut","grew","scaled",
-    # Collaboration
     "collaborated","partnered","contributed","supported","facilitated",
     "presented","communicated","negotiated","aligned",
-    # Analysis
     "analyzed","researched","evaluated","assessed","identified","diagnosed",
     "reviewed","audited","tested","validated","measured","tracked",
+    "invented","detected","brainstormed","promoted","provided","assisted",
+    "fixed","resolved","streamlined","standardized","documented",
 }
 
-# Quantification patterns — what real ATS looks for
 QUANT_PATTERNS = [
-    # Percentages: "increased by 40%", "reduced by 30%"
     r'\b(increased|decreased|reduced|improved|boosted|grew|cut|saved|accelerated|optimized)\w*\s+\w*\s*\d+\s*%',
     r'\d+\s*%\s*(increase|decrease|reduction|improvement|growth|savings)',
-    # Multipliers: "3x faster", "2x revenue"
     r'\d+(\.\d+)?\s*[xX]\s*(faster|more|better|improvement|increase|growth|reduction)',
     r'(by\s+)?\d+(\.\d+)?\s*times',
-    # Absolute numbers with context
     r'\$\s*\d+[\d,\.]*\s*(million|billion|thousand|k|m|b)?',
-    r'\b\d+[\d,]*\+?\s*(users|customers|clients|employees|teams|projects|systems|servers|records|transactions|requests)',
-    # Time savings
+    r'\b\d+[\d,]*\+?\s*(users|customers|clients|employees|teams|projects|systems|servers|records|transactions|requests|engineers|members|banks)',
     r'(saved|reduced|cut)\s+\w*\s*\d+\s*(hours?|days?|weeks?|months?)',
     r'\d+\s*(hours?|days?|weeks?|months?)\s*(saved|reduced|faster)',
-    # Scale metrics
     r'\b(handled|processed|managed|served|supported)\s+\w*\s*\d+[\d,k]+',
+    r'\b\d{2,}[\d,]*\+?\s*(solutions|issues|bugs|features|components|modules)',
 ]
 
 DEGREE_KEYWORDS = {
     "bachelor", "b.e", "b.tech", "b.sc", "b.s", "bs", "be", "btech",
     "master", "m.e", "m.tech", "m.sc", "m.s", "ms", "me", "mtech", "mba",
-    "phd", "ph.d", "doctorate", "diploma", "degree"
+    "phd", "ph.d", "doctorate", "diploma", "degree", "associate",
 }
+
+# ================== CORE: RELIABLE SKILL EXTRACTOR ==================
+
+def extract_skills_from_text(raw_text: str) -> set:
+    """
+    Match skills against raw lowercased text using per-skill regex aliases.
+    This correctly handles: node.js, c++, .net, express.js, rest apis, etc.
+    clean_text() is NOT used here — dots, plus signs, and spaces are preserved.
+    """
+    text_lower = raw_text.lower()
+    found = set()
+    for skill_label, patterns in TECH_SKILLS_MAP.items():
+        for pattern in patterns:
+            try:
+                if re.search(pattern, text_lower, re.IGNORECASE):
+                    found.add(skill_label)
+                    break  # matched, no need to check other aliases
+            except re.error:
+                pass  # malformed pattern guard
+    return found
 
 # ================== HELPERS ==================
 
@@ -123,13 +249,15 @@ def extract_text_from_pdf(uploaded_file) -> str:
         text = ""
         for page in reader.pages:
             t = page.extract_text()
-            if t: text += t + "\n"
+            if t:
+                text += t + "\n"
         return text.strip()
     except Exception as e:
         st.error(f"PDF extraction error: {e}")
         return ""
 
 def clean_text(text: str) -> str:
+    """Used ONLY for semantic similarity (sentence transformer needs clean input)."""
     text = text.lower()
     text = re.sub(r'[^a-zA-Z\s]', ' ', text)
     return re.sub(r'\s+', ' ', text).strip()
@@ -150,24 +278,22 @@ def calculate_similarity(resume_text: str, job_text: str) -> float:
     emb = model.encode([resume_text, job_text])
     return round(float(cosine_similarity([emb[0]], [emb[1]])[0][0] * 100), 2)
 
-def extract_present_skills(text: str) -> set:
-    return {s for s in TECH_SKILLS if re.search(r'\b' + re.escape(s) + r'\b', text)}
+def get_skill_gap(raw_resume: str, raw_job: str):
+    """
+    Both inputs should be raw (not cleaned) text.
+    Returns (matched_skills_sorted, missing_skills_sorted).
+    """
+    job_skills    = extract_skills_from_text(raw_job)
+    resume_skills = extract_skills_from_text(raw_resume)
+    matched  = sorted(job_skills & resume_skills)
+    missing  = sorted(job_skills - resume_skills)
+    return matched, missing
 
-def get_skill_gap(resume_text, job_text):
-    job_s    = extract_present_skills(job_text)
-    resume_s = extract_present_skills(resume_text)
-    return sorted(job_s & resume_s), sorted(job_s - resume_s)
-
-# ================== NEW: QUANTIFICATION ANALYSIS ==================
+# ================== QUANTIFICATION ANALYSIS ==================
 
 def analyze_quantification(raw_resume: str) -> dict:
-    """
-    Detects quantified impact statements in resume.
-    Real ATS systems heavily reward measurable achievements.
-    Examples: 'increased revenue by 40%', 'managed 12 engineers', 'reduced latency by 3x'
-    """
     lines = [l.strip() for l in raw_resume.split('\n') if l.strip()]
-    bullet_lines = [l for l in lines if len(l) > 20]  # meaningful lines only
+    bullet_lines = [l for l in lines if len(l) > 20]
 
     quantified_bullets   = []
     unquantified_bullets = []
@@ -179,16 +305,15 @@ def analyze_quantification(raw_resume: str) -> dict:
         else:
             unquantified_bullets.append(line)
 
-    total    = len(bullet_lines)
-    q_count  = len(quantified_bullets)
-    q_ratio  = (q_count / total * 100) if total > 0 else 0
+    total   = len(bullet_lines)
+    q_count = len(quantified_bullets)
+    q_ratio = (q_count / total * 100) if total > 0 else 0
 
-    # Score: ATS rewards 30%+ quantified bullets as strong
-    if q_ratio >= 40:   quant_score = 100
-    elif q_ratio >= 25: quant_score = 80
-    elif q_ratio >= 15: quant_score = 60
-    elif q_ratio >= 5:  quant_score = 35
-    else:               quant_score = 10
+    if q_ratio >= 20:   quant_score = 100
+    elif q_ratio >= 12: quant_score = 80
+    elif q_ratio >= 7:  quant_score = 60
+    elif q_ratio >= 3:  quant_score = 40
+    else:               quant_score = 20
 
     return {
         "score":               round(quant_score, 1),
@@ -199,20 +324,16 @@ def analyze_quantification(raw_resume: str) -> dict:
         "unquantified_sample": unquantified_bullets[:4],
     }
 
-# ================== NEW: ACTION VERB ANALYSIS ==================
+# ================== ACTION VERB ANALYSIS ==================
 
 def analyze_action_verbs(raw_resume: str) -> dict:
-    """
-    ATS systems parse bullet points and check if they start with
-    strong action verbs. Passive language scores lower.
-    """
     lines = [l.strip() for l in raw_resume.split('\n') if len(l.strip()) > 15]
 
     strong_verb_lines = []
     weak_lines        = []
 
     for line in lines:
-        first_word = line.split()[0].lower().rstrip('.,;:') if line.split() else ""
+        first_word = line.split()[0].lower().rstrip('.,;:•●–—-') if line.split() else ""
         if first_word in ACTION_VERBS:
             strong_verb_lines.append((first_word, line))
         else:
@@ -239,53 +360,49 @@ def analyze_action_verbs(raw_resume: str) -> dict:
         "weak_sample":  weak_lines[:3],
     }
 
-# ================== NEW: EXPERIENCE YEARS DETECTION ==================
+# ================== EXPERIENCE YEARS DETECTION ==================
 
-def analyze_experience(raw_resume: str, job_text: str) -> dict:
-    """
-    Detects years of experience mentioned in resume and compares
-    against what the JD requires. Real ATS systems filter on this.
-    """
-    # Detect required years from JD
+def analyze_experience(raw_resume: str, raw_job: str) -> dict:
     jd_exp_match = re.findall(
         r'(\d+)\+?\s*(?:to\s*\d+\s*)?years?\s*(?:of\s*)?(?:experience|exp)',
-        job_text, re.IGNORECASE
+        raw_job, re.IGNORECASE
     )
     required_years = max([int(x) for x in jd_exp_match], default=0)
 
-    # Detect years mentioned in resume (date ranges like 2019-2023 = 4 years)
-    date_ranges = re.findall(r'(20\d\d|19\d\d)\s*[-–—]\s*(20\d\d|present|current|now)',
-                             raw_resume, re.IGNORECASE)
+    date_ranges = re.findall(
+        r'(20\d\d|19\d\d)\s*[-–—]\s*(20\d\d|present|current|now)',
+        raw_resume, re.IGNORECASE
+    )
     total_years = 0
     for start, end in date_ranges:
         try:
             s = int(start)
             e = 2025 if end.lower() in ('present', 'current', 'now') else int(end)
             total_years += max(0, e - s)
-        except:
+        except Exception:
             pass
 
-    # Also check explicit mentions
-    explicit = re.findall(r'(\d+)\+?\s*years?\s*(?:of\s*)?(?:experience|exp)',
-                          raw_resume, re.IGNORECASE)
+    explicit = re.findall(
+        r'(\d+)\+?\s*years?\s*(?:of\s*)?(?:experience|exp)',
+        raw_resume, re.IGNORECASE
+    )
     if explicit:
         total_years = max(total_years, max(int(x) for x in explicit))
 
-    # Score
     if required_years == 0:
-        exp_score = 80  # JD didn't specify — neutral
+        exp_score    = 80
         match_status = "Not specified in JD"
     elif total_years >= required_years:
-        exp_score = 100
+        exp_score    = 100
         match_status = f"✓ Meets requirement ({total_years}y detected, {required_years}y required)"
     elif total_years >= required_years * 0.75:
-        exp_score = 70
+        exp_score    = 70
         match_status = f"⚠ Close ({total_years}y detected, {required_years}y required)"
     elif total_years > 0:
-        exp_score = 40
+        exp_score    = 40
         match_status = f"✗ Below requirement ({total_years}y detected, {required_years}y required)"
     else:
-        exp_score = 20
+        exp_score    = 20
         match_status = f"✗ No experience dates found (JD requires {required_years}y)"
 
     return {
@@ -295,35 +412,28 @@ def analyze_experience(raw_resume: str, job_text: str) -> dict:
         "match_status":   match_status,
     }
 
-# ================== NEW: JOB TITLE ALIGNMENT ==================
+# ================== JOB TITLE ALIGNMENT ==================
 
-def analyze_job_title(raw_resume: str, job_text: str) -> dict:
-    """
-    ATS systems check if the candidate's most recent job title
-    aligns with the role being applied for.
-    """
-    jd_lower  = job_text.lower()
+def analyze_job_title(raw_resume: str, raw_job: str) -> dict:
+    jd_lower  = raw_job.lower()
     res_lower = raw_resume.lower()
 
-    # Common title keywords grouped by role family
     title_groups = {
-        "software engineer":    ["software engineer","software developer","sde","swe","backend","frontend","fullstack","full stack","full-stack"],
-        "data scientist":       ["data scientist","ml engineer","machine learning","ai engineer","data analyst","research scientist"],
-        "devops / cloud":       ["devops","cloud engineer","site reliability","sre","platform engineer","infrastructure"],
-        "product manager":      ["product manager","product owner","pm","program manager"],
-        "data engineer":        ["data engineer","etl","pipeline","spark","hadoop","big data"],
-        "security":             ["security engineer","cybersecurity","penetration","infosec","soc analyst"],
-        "mobile":               ["ios developer","android developer","mobile developer","flutter","react native"],
-        "manager / lead":       ["engineering manager","tech lead","team lead","vp engineering","director"],
+        "software engineer":  ["software engineer","software developer","sde","swe","backend","frontend","fullstack","full stack","full-stack"],
+        "data scientist":     ["data scientist","ml engineer","machine learning","ai engineer","data analyst","research scientist"],
+        "devops / cloud":     ["devops","cloud engineer","site reliability","sre","platform engineer","infrastructure"],
+        "product manager":    ["product manager","product owner","program manager"],
+        "data engineer":      ["data engineer","etl","pipeline","spark","hadoop","big data"],
+        "security":           ["security engineer","cybersecurity","penetration","infosec","soc analyst"],
+        "mobile":             ["ios developer","android developer","mobile developer","flutter","react native"],
+        "manager / lead":     ["engineering manager","tech lead","team lead","vp engineering","director"],
     }
 
-    jd_role    = None
-    res_role   = None
+    jd_role  = None
+    res_role = None
     for role, keywords in title_groups.items():
-        if any(k in jd_lower for k in keywords):
-            jd_role = role
-        if any(k in res_lower for k in keywords):
-            res_role = role
+        if any(k in jd_lower  for k in keywords): jd_role  = role
+        if any(k in res_lower for k in keywords): res_role = role
 
     if jd_role and res_role and jd_role == res_role:
         title_score  = 100
@@ -339,28 +449,25 @@ def analyze_job_title(raw_resume: str, job_text: str) -> dict:
         title_status = "Could not detect specific role family"
 
     return {
-        "score":        round(title_score, 1),
-        "jd_role":      jd_role or "Unknown",
-        "resume_role":  res_role or "Not detected",
-        "status":       title_status,
+        "score":       round(title_score, 1),
+        "jd_role":     jd_role or "Unknown",
+        "resume_role": res_role or "Not detected",
+        "status":      title_status,
     }
 
-# ================== NEW: EDUCATION MATCH ==================
+# ================== EDUCATION MATCH ==================
 
-def analyze_education(raw_resume: str, job_text: str) -> dict:
-    """
-    Checks if resume contains education credentials and if they
-    align with what the JD requires.
-    """
+def analyze_education(raw_resume: str, raw_job: str) -> dict:
     res_lower = raw_resume.lower()
-    jd_lower  = job_text.lower()
+    jd_lower  = raw_job.lower()
 
     has_degree   = any(d in res_lower for d in DEGREE_KEYWORDS)
     jd_needs_deg = any(d in jd_lower  for d in DEGREE_KEYWORDS)
 
-    # Check for relevant field of study
-    cs_fields = ["computer science","information technology","software","electronics",
-                 "electrical","it ","cse","ece","computer engineering"]
+    cs_fields = [
+        "computer science","information technology","software","electronics",
+        "electrical","cse","ece","computer engineering","it ",
+    ]
     has_cs_degree = any(f in res_lower for f in cs_fields)
 
     if has_degree and has_cs_degree:
@@ -382,31 +489,28 @@ def analyze_education(raw_resume: str, job_text: str) -> dict:
         "status":     edu_status,
     }
 
-# ================== REBUILT 9-COMPONENT ATS SCORE ==================
+# ================== 9-COMPONENT ATS SCORE ==================
 
-def calculate_ats_score(sim, resume_text, job_text, raw_resume) -> dict:
+def calculate_ats_score(sim, raw_resume, raw_job, resume_clean) -> dict:
     """
-    Industry-grade 9-component ATS score modeled after
-    Workday / Greenhouse / Lever scoring logic:
+    9-Component ATS Score:
+      Semantic similarity      25%
+      Keyword coverage         20%
+      Quantified impact        15%
+      Action verb strength     10%
+      Section completeness      8%
+      Contact completeness      7%
+      Job title alignment       5%
+      Experience years          5%
+      Education match           5%
 
-    Component               Weight  What it checks
-    ─────────────────────────────────────────────────
-    Semantic similarity      25%    Meaning-level match (BERT)
-    Keyword coverage         20%    Exact skill term overlap
-    Quantified impact        15%    Numbers / % / $ in bullets  ← NEW
-    Action verb strength     10%    Strong opening verbs        ← NEW
-    Job title alignment       5%    Role family match           ← NEW
-    Experience years          5%    Years match JD requirement  ← NEW
-    Education match           5%    Degree present & relevant   ← NEW
-    Section completeness      8%    Standard sections present
-    Contact completeness      7%    Email / phone / LinkedIn
+    NOTE: skill extraction uses raw text (not cleaned) to correctly handle
+    node.js, c++, .net, express.js, rest, etc.
     """
-
-    # ── Existing components ──
-    job_s    = extract_present_skills(job_text)
-    resume_s = extract_present_skills(resume_text)
-    matched  = job_s & resume_s
-    kw_score = (len(matched) / len(job_s) * 100) if job_s else 0
+    job_skills    = extract_skills_from_text(raw_job)
+    resume_skills = extract_skills_from_text(raw_resume)
+    matched       = job_skills & resume_skills
+    kw_score      = (len(matched) / len(job_skills) * 100) if job_skills else 0
 
     sections  = detect_sections(raw_resume)
     sec_score = sum(sections[s] for s in ["education","experience","skills"]) / 3 * 100
@@ -414,30 +518,26 @@ def calculate_ats_score(sim, resume_text, job_text, raw_resume) -> dict:
     contact   = detect_contact_info(raw_resume)
     con_score = sum(contact.values()) / len(contact) * 100
 
-    # ── New components ──
-    quant  = analyze_quantification(raw_resume)
-    verbs  = analyze_action_verbs(raw_resume)
-    exp    = analyze_experience(raw_resume, job_text)
-    title  = analyze_job_title(raw_resume, job_text)
-    edu    = analyze_education(raw_resume, job_text)
+    quant = analyze_quantification(raw_resume)
+    verbs = analyze_action_verbs(raw_resume)
+    exp   = analyze_experience(raw_resume, raw_job)
+    title = analyze_job_title(raw_resume, raw_job)
+    edu   = analyze_education(raw_resume, raw_job)
 
-    # ── Weighted total ──
     total = (
-        0.25 * sim             +
-        0.20 * kw_score        +
-        0.15 * quant["score"]  +
-        0.10 * verbs["score"]  +
-        0.05 * title["score"]  +
-        0.05 * exp["score"]    +
-        0.05 * edu["score"]    +
-        0.08 * sec_score       +
-        0.07 * con_score
+        0.25 * sim            +
+        0.35 * kw_score       +
+        0.06 * quant["score"] +
+        0.06 * verbs["score"] +
+        0.07 * sec_score      +
+        0.04 * con_score      +
+        0.02 * title["score"] +
+        0.05 * exp["score"]   +
+        0.10 * edu["score"]
     )
 
     return {
-        # Totals
         "total":        round(total, 1),
-        # Component scores
         "semantic":     round(sim, 1),
         "keyword":      round(kw_score, 1),
         "quantified":   quant["score"],
@@ -447,7 +547,6 @@ def calculate_ats_score(sim, resume_text, job_text, raw_resume) -> dict:
         "education":    edu["score"],
         "sections":     round(sec_score, 1),
         "contact":      round(con_score, 1),
-        # Detailed breakdowns
         "quant_detail": quant,
         "verb_detail":  verbs,
         "exp_detail":   exp,
@@ -455,10 +554,10 @@ def calculate_ats_score(sim, resume_text, job_text, raw_resume) -> dict:
         "edu_detail":   edu,
         "sections_map": sections,
         "contact_map":  contact,
-        "word_count":   len(resume_text.split()),
+        "word_count":   len(resume_clean.split()),
     }
 
-# ================== FEEDBACK (updated) ==================
+# ================== FEEDBACK ==================
 
 def generate_feedback(sim, ats, matched, missing) -> list:
     tips = []
@@ -469,35 +568,34 @@ def generate_feedback(sim, ats, matched, missing) -> list:
     elif sim < 70:
         tips.append(("warning", "Semantic match is moderate. Align your experience bullets more closely with the job's stated responsibilities."))
     else:
-        tips.append(("success", "Strong semantic alignment with the job description — your language closely mirrors what the role needs."))
+        tips.append(("success", "Strong semantic alignment — your language closely mirrors what the role needs."))
 
-    # Quantification — most important new feedback
+    # Quantification
     q = ats["quant_detail"]
-    if q["ratio"] < 15:
+    if q["ratio"] < 7:
         tips.append(("danger",
             f"Only {q['quantified_count']} of your {q['total_bullets']} bullets contain measurable impact ({q['ratio']:.0f}%). "
-            f"ATS systems and HR both heavily reward quantified achievements. "
             f"Add numbers like: 'Reduced API response time by 40%', 'Managed team of 8 engineers', 'Increased test coverage from 45% to 90%'."))
-    elif q["ratio"] < 30:
+    elif q["ratio"] < 15:
         tips.append(("warning",
             f"{q['quantified_count']} quantified bullets detected ({q['ratio']:.0f}%). "
             f"Target 30–40% of your bullets having measurable impact. Add % improvements, team sizes, revenue figures, or time savings."))
     else:
         tips.append(("success",
-            f"Good quantification — {q['quantified_count']} bullets with measurable impact ({q['ratio']:.0f}%). This is what HR looks for."))
+            f"Good quantification — {q['quantified_count']} bullets with measurable impact ({q['ratio']:.0f}%)."))
 
     # Action verbs
     v = ats["verb_detail"]
     if v["ratio"] < 20:
         tips.append(("danger",
             f"Only {v['ratio']:.0f}% of your lines start with strong action verbs. "
-            f"ATS parsers reward active language. Start bullets with verbs like: Built, Designed, Led, Reduced, Deployed, Optimized."))
+            f"Start bullets with verbs like: Built, Designed, Led, Reduced, Deployed, Optimized."))
     elif v["ratio"] < 40:
         tips.append(("warning",
             f"Action verb usage is moderate ({v['ratio']:.0f}%). "
             f"Verbs found: {', '.join(v['verbs_used'][:6])}. Aim for 50%+ of bullets starting with strong action verbs."))
     else:
-        tips.append(("success", f"Strong action verb usage ({v['ratio']:.0f}%). Verbs like {', '.join(v['verbs_used'][:5])} signal impact to ATS."))
+        tips.append(("success", f"Strong action verb usage ({v['ratio']:.0f}%). Verbs like {', '.join(v['verbs_used'][:5])} signal impact."))
 
     # Job title
     t = ats["title_detail"]
@@ -507,7 +605,7 @@ def generate_feedback(sim, ats, matched, missing) -> list:
     # Experience
     e = ats["exp_detail"]
     if e["score"] < 70:
-        tips.append(("danger" if e["score"] < 40 else "warning", f"Experience: {e['status']}."))
+        tips.append(("danger" if e["score"] < 40 else "warning", f"Experience: {e['match_status']}."))
 
     # Education
     ed = ats["edu_detail"]
@@ -525,8 +623,7 @@ def generate_feedback(sim, ats, matched, missing) -> list:
         tips.append(("danger", f"Missing sections: {', '.join(s.title() for s in miss_sec)}. Standard section headers are required for ATS parsing."))
 
     # Contact
-    contact = ats["contact_map"]
-    missing_contact = [f for f, v in contact.items() if not v]
+    missing_contact = [f for f, v in ats["contact_map"].items() if not v]
     if missing_contact:
         tips.append(("warning", f"Missing contact info: {', '.join(missing_contact)}. Add these for recruiter reachability."))
 
@@ -578,7 +675,8 @@ def plot_ats_breakdown(ats):
 
 def plot_skill_donut(matched, missing):
     m, n = len(matched), len(missing)
-    if m + n == 0: return None
+    if m + n == 0:
+        return None
 
     fig, ax = plt.subplots(figsize=(3.5, 3.5))
     fig.patch.set_facecolor("#16161E")
@@ -602,7 +700,6 @@ def plot_skill_donut(matched, missing):
     return fig
 
 def plot_quant_gauge(ratio):
-    """Mini horizontal gauge showing quantification ratio."""
     fig, ax = plt.subplots(figsize=(5, 0.55))
     fig.patch.set_facecolor("#16161E")
     ax.set_facecolor("#16161E")
@@ -656,27 +753,32 @@ def main():
             st.error("Could not extract text. Ensure the PDF is not image-only / scanned.")
             return
 
-        resume_clean     = clean_text(raw_resume)
-        job_clean        = clean_text(job_description)
-        similarity       = calculate_similarity(resume_clean, job_clean)
-        matched, missing = get_skill_gap(resume_clean, job_clean)
-        ats              = calculate_ats_score(similarity, resume_clean, job_clean, raw_resume)
-        feedback         = generate_feedback(similarity, ats, matched, missing)
+        # clean_text() ONLY used for semantic similarity model
+        resume_clean = clean_text(raw_resume)
+        job_clean    = clean_text(job_description)
+        similarity   = calculate_similarity(resume_clean, job_clean)
+
+        # Skill gap uses RAW text to correctly match node.js, c++, .net, etc.
+        matched, missing = get_skill_gap(raw_resume, job_description)
+
+        # ATS score also uses raw text internally for skill/keyword scoring
+        ats      = calculate_ats_score(similarity, raw_resume, job_description, resume_clean)
+        feedback = generate_feedback(similarity, ats, matched, missing)
 
     st.markdown("<br>", unsafe_allow_html=True)
     st.divider()
 
     # ── KPI Row ──
     k1, k2, k3, k4, k5 = st.columns(5)
-    k1.metric("ATS Score",        f"{ats['total']:.0f}%",
+    k1.metric("ATS Score",          f"{ats['total']:.0f}%",
               "Strong" if ats['total'] >= 70 else ("Decent" if ats['total'] >= 50 else "Low"))
-    k2.metric("Semantic Match",   f"{similarity:.0f}%",
+    k2.metric("Semantic Match",     f"{similarity:.0f}%",
               "Strong" if similarity >= 70 else ("Moderate" if similarity >= 40 else "Low"))
-    k3.metric("Keyword Match",    f"{ats['keyword']:.0f}%",
+    k3.metric("Keyword Match",      f"{ats['keyword']:.0f}%",
               f"{len(matched)} of {len(matched)+len(missing)} skills")
     k4.metric("Quantified Bullets", f"{ats['quant_detail']['ratio']:.0f}%",
               f"{ats['quant_detail']['quantified_count']} found")
-    k5.metric("Action Verbs",     f"{ats['verb_detail']['ratio']:.0f}%",
+    k5.metric("Action Verbs",       f"{ats['verb_detail']['ratio']:.0f}%",
               f"{ats['verb_detail']['strong_count']} strong lines")
 
     st.markdown("<br>", unsafe_allow_html=True)
@@ -698,7 +800,7 @@ def main():
 
         with c2:
             st.markdown('<p class="section-label">Job Title Alignment</p>', unsafe_allow_html=True)
-            t = ats["title_detail"]
+            t   = ats["title_detail"]
             cls = "badge-ok" if t["score"] >= 70 else "badge-bad"
             st.markdown(f'<span class="badge {cls}">{t["jd_role"]}</span>', unsafe_allow_html=True)
             st.caption(t["status"])
@@ -706,8 +808,10 @@ def main():
             st.markdown("<br>", unsafe_allow_html=True)
             st.markdown('<p class="section-label">Experience</p>', unsafe_allow_html=True)
             e = ats["exp_detail"]
-            st.markdown(f'<span class="badge {"badge-ok" if e["score"]>=70 else "badge-bad"}">{e["match_status"]}</span>',
-                        unsafe_allow_html=True)
+            st.markdown(
+                f'<span class="badge {"badge-ok" if e["score"]>=70 else "badge-bad"}">{e["match_status"]}</span>',
+                unsafe_allow_html=True
+            )
 
             st.markdown("<br>", unsafe_allow_html=True)
             st.markdown('<p class="section-label">Sections</p>', unsafe_allow_html=True)
@@ -740,7 +844,7 @@ def main():
                 f'<div class="tip-card">'
                 f'<strong>{q["quantified_count"]}</strong> of <strong>{q["total_bullets"]}</strong> '
                 f'bullets contain measurable impact — <strong>{q["ratio"]:.0f}%</strong><br>'
-                f'<small>Industry target: 30–40% of bullets quantified</small>'
+                f'<small>Industry target: 15–20% of bullets quantified</small>'
                 f'</div>',
                 unsafe_allow_html=True
             )
@@ -749,15 +853,19 @@ def main():
             if q["quantified_examples"]:
                 st.markdown('<p class="section-label" style="margin-top:1rem">✓ Good Examples Found</p>', unsafe_allow_html=True)
                 for ex in q["quantified_examples"]:
-                    st.markdown(f'<div class="tip-card" style="border-left-color:#22C55E;font-size:0.8rem">{ex[:120]}</div>',
-                                unsafe_allow_html=True)
+                    st.markdown(
+                        f'<div class="tip-card" style="border-left-color:#22C55E;font-size:0.8rem">{ex[:120]}</div>',
+                        unsafe_allow_html=True
+                    )
 
             if q["unquantified_sample"]:
                 st.markdown('<p class="section-label" style="margin-top:1rem">✗ Needs Numbers Added</p>', unsafe_allow_html=True)
                 for ex in q["unquantified_sample"]:
-                    st.markdown(f'<div class="tip-card" style="border-left-color:#EF4444;font-size:0.8rem">{ex[:120]}<br>'
-                                f'<small style="color:#8B8AA0">→ Try adding: "by X%", "for N users", "saving $X"</small></div>',
-                                unsafe_allow_html=True)
+                    st.markdown(
+                        f'<div class="tip-card" style="border-left-color:#EF4444;font-size:0.8rem">{ex[:120]}<br>'
+                        f'<small style="color:#8B8AA0">→ Try adding: "by X%", "for N users", "saving $X"</small></div>',
+                        unsafe_allow_html=True
+                    )
 
         with va:
             st.markdown('<p class="section-label">Action Verb Strength</p>', unsafe_allow_html=True)
@@ -777,7 +885,7 @@ def main():
             st.markdown('<p class="section-label" style="margin-top:1rem">Suggested Power Verbs</p>', unsafe_allow_html=True)
             suggestions = ["Engineered","Optimized","Spearheaded","Architected",
                            "Accelerated","Reduced","Delivered","Scaled","Drove","Automated"]
-            used_set = set(v["verbs_used"])
+            used_set  = set(v["verbs_used"])
             new_verbs = [s for s in suggestions if s.lower() not in used_set][:8]
             pills2 = "".join(f'<span class="skill-pill pill-miss">{vb}</span>' for vb in new_verbs)
             st.markdown(pills2, unsafe_allow_html=True)
