@@ -57,7 +57,9 @@ TECH_SKILLS = {
     "communication","leadership","teamwork","problem-solving",
     "collaboration","management","mentoring","presentation",
     "analytical","research","documentation","testing","c/c++","c" , "C/C++",
-    "data structures" , "algorithms" , "software design"
+    "data structures" , "algorithms" , "software design" , "CI/CD" , "AWS" , "Azure",
+    "GCP" , ".NET" , ".net" , "Node.js" , "Express.js" , "REST APIs" , "RESTful APIs", 
+    "microservices"
 }
 
 SECTION_PATTERNS = {
