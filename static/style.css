@@ -1,0 +1,285 @@
+/* ── Google Fonts ── */
+@import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap');
+
+/* ── Root Variables ── */
+:root {
+    --accent:       #6C63FF;
+    --accent-light: #8B85FF;
+    --accent-dim:   rgba(108, 99, 255, 0.12);
+    --success:      #22C55E;
+    --warning:      #F59E0B;
+    --danger:       #EF4444;
+    --bg-primary:   #0F0F14;
+    --bg-card:      #16161E;
+    --bg-card2:     #1C1C28;
+    --border:       rgba(255,255,255,0.07);
+    --text-primary: #F0EFF8;
+    --text-muted:   #8B8AA0;
+    --radius:       14px;
+}
+
+/* ── Global Reset ── */
+html, body, [class*="css"] {
+    font-family: 'DM Sans', sans-serif !important;
+    background-color: var(--bg-primary) !important;
+    color: var(--text-primary) !important;
+}
+
+/* ── Hide Streamlit Chrome ── */
+#MainMenu, footer, header { visibility: hidden; }
+.block-container {
+    padding: 2rem 3rem !important;
+    max-width: 1100px !important;
+}
+
+/* ── Hero Header ── */
+.hero-title {
+    font-family: 'Syne', sans-serif !important;
+    font-size: 3rem;
+    font-weight: 800;
+    letter-spacing: -1px;
+    background: linear-gradient(135deg, #F0EFF8 0%, #6C63FF 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0 0 0.4rem 0;
+    line-height: 1.1;
+}
+.hero-sub {
+    font-size: 1rem;
+    color: var(--text-muted);
+    margin: 0 0 2.5rem 0;
+    font-weight: 300;
+    letter-spacing: 0.01em;
+}
+
+/* ── Section Labels ── */
+.section-label {
+    font-family: 'Syne', sans-serif !important;
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent-light);
+    margin-bottom: 0.5rem;
+}
+
+/* ── Upload + Textarea Cards ── */
+.stFileUploader, .stTextArea {
+    background: var(--bg-card) !important;
+    border-radius: var(--radius) !important;
+}
+[data-testid="stFileUploader"] {
+    background: var(--bg-card) !important;
+    border: 1.5px dashed rgba(108,99,255,0.35) !important;
+    border-radius: var(--radius) !important;
+    padding: 1.5rem !important;
+    transition: border-color 0.2s;
+}
+[data-testid="stFileUploader"]:hover {
+    border-color: var(--accent) !important;
+}
+textarea {
+    background: var(--bg-card) !important;
+    border: 1.5px solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    color: var(--text-primary) !important;
+    font-family: 'DM Sans', sans-serif !important;
+    resize: vertical !important;
+    transition: border-color 0.2s;
+}
+textarea:focus {
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 0 3px var(--accent-dim) !important;
+    outline: none !important;
+}
+
+/* ── Analyze Button ── */
+.stButton > button {
+    background: var(--accent) !important;
+    color: white !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-family: 'Syne', sans-serif !important;
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+    padding: 0.75rem 2.5rem !important;
+    letter-spacing: 0.03em !important;
+    transition: all 0.2s ease !important;
+    box-shadow: 0 4px 20px rgba(108,99,255,0.3) !important;
+    width: 100% !important;
+}
+.stButton > button:hover {
+    background: var(--accent-light) !important;
+    transform: translateY(-1px) !important;
+    box-shadow: 0 6px 28px rgba(108,99,255,0.45) !important;
+}
+.stButton > button:active {
+    transform: translateY(0px) !important;
+}
+
+/* ── Metric Cards ── */
+[data-testid="stMetric"] {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border) !important;
+    border-radius: var(--radius) !important;
+    padding: 1.2rem 1.5rem !important;
+    transition: border-color 0.2s;
+}
+[data-testid="stMetric"]:hover {
+    border-color: rgba(108,99,255,0.3) !important;
+}
+[data-testid="metric-container"] label {
+    font-size: 0.72rem !important;
+    letter-spacing: 0.08em !important;
+    text-transform: uppercase !important;
+    color: var(--text-muted) !important;
+    font-family: 'DM Sans', sans-serif !important;
+}
+[data-testid="metric-container"] [data-testid="stMetricValue"] {
+    font-family: 'Syne', sans-serif !important;
+    font-size: 2rem !important;
+    font-weight: 700 !important;
+    color: var(--text-primary) !important;
+}
+[data-testid="metric-container"] [data-testid="stMetricDelta"] {
+    font-size: 0.78rem !important;
+}
+
+/* ── Tabs ── */
+.stTabs [data-baseweb="tab-list"] {
+    background: var(--bg-card) !important;
+    border-radius: 10px !important;
+    padding: 4px !important;
+    gap: 2px !important;
+    border: 1px solid var(--border) !important;
+}
+.stTabs [data-baseweb="tab"] {
+    background: transparent !important;
+    color: var(--text-muted) !important;
+    border-radius: 8px !important;
+    font-family: 'DM Sans', sans-serif !important;
+    font-size: 0.88rem !important;
+    font-weight: 500 !important;
+    padding: 0.4rem 1.2rem !important;
+    transition: all 0.15s !important;
+    border: none !important;
+}
+.stTabs [aria-selected="true"] {
+    background: var(--accent) !important;
+    color: white !important;
+}
+.stTabs [data-baseweb="tab-panel"] {
+    padding-top: 1.5rem !important;
+}
+
+/* ── Alert / Banners ── */
+.stAlert {
+    border-radius: var(--radius) !important;
+    border: 1px solid var(--border) !important;
+}
+[data-testid="stAlert"][kind="success"] {
+    background: rgba(34,197,94,0.08) !important;
+    border-color: rgba(34,197,94,0.25) !important;
+    color: #86EFAC !important;
+}
+[data-testid="stAlert"][kind="error"] {
+    background: rgba(239,68,68,0.08) !important;
+    border-color: rgba(239,68,68,0.25) !important;
+    color: #FCA5A5 !important;
+}
+[data-testid="stAlert"][kind="warning"] {
+    background: rgba(245,158,11,0.08) !important;
+    border-color: rgba(245,158,11,0.25) !important;
+    color: #FCD34D !important;
+}
+[data-testid="stAlert"][kind="info"] {
+    background: rgba(108,99,255,0.08) !important;
+    border-color: rgba(108,99,255,0.3) !important;
+    color: #C4C2FF !important;
+}
+
+/* ── Spinner ── */
+.stSpinner > div > div {
+    border-top-color: var(--accent) !important;
+}
+
+/* ── Expander ── */
+.streamlit-expanderHeader {
+    background: var(--bg-card) !important;
+    border-radius: var(--radius) !important;
+    border: 1px solid var(--border) !important;
+    font-family: 'DM Sans', sans-serif !important;
+    color: var(--text-muted) !important;
+}
+.streamlit-expanderContent {
+    background: var(--bg-card2) !important;
+    border: 1px solid var(--border) !important;
+    border-top: none !important;
+    border-radius: 0 0 var(--radius) var(--radius) !important;
+}
+
+/* ── Divider ── */
+hr {
+    border-color: var(--border) !important;
+    margin: 1.5rem 0 !important;
+}
+
+/* ── Skill Pills ── */
+.skill-pill {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 0.78rem;
+    font-weight: 500;
+    margin: 3px;
+    font-family: 'DM Sans', sans-serif;
+}
+.pill-match {
+    background: rgba(34,197,94,0.12);
+    color: #86EFAC;
+    border: 1px solid rgba(34,197,94,0.25);
+}
+.pill-miss {
+    background: rgba(239,68,68,0.1);
+    color: #FCA5A5;
+    border: 1px solid rgba(239,68,68,0.2);
+}
+
+/* ── Score Ring Container ── */
+.score-ring-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+}
+
+/* ── Section/Contact Badge ── */
+.badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 5px 12px;
+    border-radius: 8px;
+    font-size: 0.8rem;
+    font-weight: 500;
+    margin: 3px;
+}
+.badge-ok  { background: rgba(34,197,94,0.1); color: #86EFAC; border: 1px solid rgba(34,197,94,0.2); }
+.badge-bad { background: rgba(239,68,68,0.08); color: #FCA5A5; border: 1px solid rgba(239,68,68,0.18); }
+
+/* ── Feedback tip cards ── */
+.tip-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-left: 3px solid var(--accent);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    padding: 0.85rem 1.1rem;
+    margin-bottom: 0.65rem;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    color: var(--text-primary);
+}
